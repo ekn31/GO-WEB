@@ -1,6 +1,7 @@
 package producto
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -19,8 +20,20 @@ func NewControladorProducto(service producto.Service) *Controlador {
 
 }
 
-func (c *Controlador) GetAll() gin.HandlerFunc {
+func (c *Controlador) GetAll(tokenEnv string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		tokenHeader := ctx.GetHeader("tokenPostman")
+
+		if tokenHeader == tokenEnv {
+			fmt.Println("token valido")
+		}
+		if tokenHeader != tokenEnv {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"mensaje": "Token invalido",
+			})
+			return
+		}
+
 		productos, err := c.service.GetAll(ctx)
 
 		if err != nil {
