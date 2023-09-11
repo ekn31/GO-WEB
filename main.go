@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"time"
@@ -36,6 +37,7 @@ func main() {
 	router.GET("/producto/search", func(ctx *gin.Context) {
 
 		precioQuery := ctx.Query("priceGT")
+		user := ctx.Query("user")
 
 		if precioQuery != "" {
 			precio, err := strconv.ParseFloat(precioQuery, 64) // Convierte el parametro
@@ -52,9 +54,11 @@ func main() {
 
 		}
 
+		nuevoContexto := addToContext(ctx, user)
+
 		// si no pasamos parametros, devuelve todo lo que esta en storage
 		ctx.JSON(http.StatusOK, gin.H{
-			"data": storage.GetAll(),
+			"data": storage.GetAll(nuevoContexto),
 		})
 
 	})
@@ -96,4 +100,9 @@ func loadData() []producto.Producto {
 	}
 
 	return productos
+}
+
+func addToContext(ctx context.Context, user string) context.Context {
+	nuevoContexto := context.WithValue(ctx, "user", user)
+	return nuevoContexto
 }

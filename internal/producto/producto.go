@@ -1,6 +1,7 @@
 package producto
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -27,7 +28,11 @@ func (s *Storage) PrintInfo() {
 
 // Funcion para retornar todo
 
-func (s *Storage) GetAll() []Producto {
+func (s *Storage) GetAll(ctx context.Context) []Producto {
+	user, ok := ctx.Value("user").(string)
+	if ok && user != "" {
+		fmt.Println("Valor de contexto en package producto: ", user)
+	}
 	return s.Productos
 }
 
